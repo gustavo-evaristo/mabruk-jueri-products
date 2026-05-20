@@ -23,6 +23,7 @@ interface StoreState {
   reset: () => void;
   updateSettings: (patch: Partial<GlobalSettings>) => void;
   updateProduct: (id: string, patch: Partial<Product>) => void;
+  removeProduct: (id: string) => void;
 }
 
 function buildProduct(p: ParsedProduct, idx: number, s: GlobalSettings): Product {
@@ -81,4 +82,6 @@ export const useProductsStore = create<StoreState>((set) => ({
     set((state) => ({
       products: state.products.map((p) => (p.id === id ? { ...p, ...patch } : p)),
     })),
+  removeProduct: (id) =>
+    set((state) => ({ products: state.products.filter((p) => p.id !== id) })),
 }));

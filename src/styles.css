@@ -321,10 +321,34 @@ h1 {
   background: #fff;
   border: 1px solid #e2e4eb;
   border-radius: 10px;
-  padding: 14px;
+  padding: 14px 48px 14px 14px;
   display: grid;
   grid-template-columns: 120px 1fr;
   gap: 14px;
+  position: relative;
+}
+
+.card-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #b5b9c5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms, color 120ms, border-color 120ms;
+  z-index: 1;
+}
+.card-remove:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
 }
 
 .card .photo {
