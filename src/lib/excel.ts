@@ -4,8 +4,10 @@ import {
   custoBanhoOuro,
   custoBanhoPrata,
   custoCompra,
+  isAco,
   milesimoOuro,
   milesimoPrata,
+  precoFinalAco,
   precoFinalOuro,
   precoFinalPrata,
 } from './calc';
@@ -38,9 +40,10 @@ export const HEADERS = [
   'Status',
 ] as const;
 
-type Row = (string | number | null)[];
+export type ExcelCell = string | number | null;
+export type ExcelRow = ExcelCell[];
 
-function buildRowOuro(p: Product, s: GlobalSettings): Row {
+function buildRowOuro(p: Product, s: GlobalSettings): ExcelRow {
   return [
     null,
     null,
@@ -70,7 +73,7 @@ function buildRowOuro(p: Product, s: GlobalSettings): Row {
   ];
 }
 
-function buildRowPrata(p: Product, s: GlobalSettings): Row {
+function buildRowPrata(p: Product, s: GlobalSettings): ExcelRow {
   return [
     null,
     null,
@@ -100,6 +103,49 @@ function buildRowPrata(p: Product, s: GlobalSettings): Row {
   ];
 }
 
+function buildRowAco(p: Product, s: GlobalSettings): ExcelRow {
+  return [
+    null,
+    null,
+    null,
+    null,
+    p.descricao,
+    p.codigoFornecedor,
+    s.fornecedor,
+    p.categoria,
+    p.subcategoriaAco,
+    'AÇO',
+    null,
+    null,
+    p.peso,
+    null, // Milésimos de Banho — aço não é banhado
+    custoCompra(p, s),
+    0,
+    0,
+    0,
+    0,
+    0,
+    precoFinalAco(p, s),
+    p.qtdAco,
+    null,
+    'Sim',
+    'Ativo',
+  ];
+}
+
+export function buildExcelRows(products: Product[], settings: GlobalSettings): ExcelRow[] {
+  const rows: ExcelRow[] = [];
+  for (const p of products) {
+    if (isAco(p.descricao)) {
+      if (p.qtdAco > 0) rows.push(buildRowAco(p, settings));
+    } else {
+      if (p.qtdOuro > 0) rows.push(buildRowOuro(p, settings));
+      if (p.qtdPrata > 0) rows.push(buildRowPrata(p, settings));
+    }
+  }
+  return rows;
+}
+
 export async function gerarExcel(products: Product[], settings: GlobalSettings): Promise<void> {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('Report');
@@ -107,10 +153,8 @@ export async function gerarExcel(products: Product[], settings: GlobalSettings):
   ws.addRow([...HEADERS]);
   ws.getRow(1).font = { bold: true };
 
-  for (const p of products) {
-    if (p.qtdOuro > 0) ws.addRow(buildRowOuro(p, settings));
-    if (p.qtdPrata > 0) ws.addRow(buildRowPrata(p, settings));
-  }
+  const rows = buildExcelRows(products, settings);
+  for (const r of rows) ws.addRow(r);
 
   HEADERS.forEach((h, i) => {
     ws.getColumn(i + 1).width = Math.max(12, h.length + 2);

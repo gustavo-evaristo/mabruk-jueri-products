@@ -1,6 +1,14 @@
 import type { GlobalSettings, Product } from '../types';
 import { CATEGORIA_BANHO } from './categoriaBanho';
 
+export function isAco(descricao: string): boolean {
+  const norm = (descricao ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase();
+  return /\baco\b/.test(norm);
+}
+
 export function descontoEfetivo(p: Product, settings: GlobalSettings): number {
   return p.descontoPct ?? settings.descontoGlobalPct;
 }
@@ -61,12 +69,25 @@ export function precoSugeridoPrata(p: Product, s: GlobalSettings): number {
   return aplicarMarkup(custoTotalPrata(p, s), s.markupPct);
 }
 
+export function custoTotalAco(p: Product, s: GlobalSettings): number {
+  // Aço não tem banho, então o custo total é só o custo de compra (com desconto).
+  return custoCompra(p, s);
+}
+
+export function precoSugeridoAco(p: Product, s: GlobalSettings): number {
+  return aplicarMarkup(custoTotalAco(p, s), s.markupPct);
+}
+
 export function precoFinalOuro(p: Product, s: GlobalSettings): number {
   return p.precoVarejoOuro ?? precoSugeridoOuro(p, s);
 }
 
 export function precoFinalPrata(p: Product, s: GlobalSettings): number {
   return p.precoVarejoPrata ?? precoSugeridoPrata(p, s);
+}
+
+export function precoFinalAco(p: Product, s: GlobalSettings): number {
+  return p.precoVarejoAco ?? precoSugeridoAco(p, s);
 }
 
 export function round2(n: number): number {

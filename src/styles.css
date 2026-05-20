@@ -18,6 +18,213 @@ h1 {
   margin: 0 0 16px;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #4f46e5;
+  border: 1px solid #4f46e5;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.btn-secondary:hover {
+  background: #f3f1ff;
+}
+
+.uploader {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+.uploader-card {
+  background: #fff;
+  border: 1px solid #e2e4eb;
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.uploader-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.uploader-card p {
+  margin: 0 0 24px;
+  color: #5a6075;
+  font-size: 14px;
+}
+
+.loading {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #5a6075;
+  font-size: 13px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #d1d5e0;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  margin-top: 16px;
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 20, 35, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1400px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #e2e4eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.modal-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #5a6075;
+  max-width: 800px;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #5a6075;
+  width: 32px;
+  height: 32px;
+  line-height: 1;
+  border-radius: 6px;
+}
+.modal-close:hover { background: #f0f1f5; }
+
+.modal-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+}
+
+.empty {
+  padding: 40px;
+  text-align: center;
+  color: #5a6075;
+  width: 100%;
+}
+
+.preview-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+}
+
+.preview-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.preview-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f0f1f5;
+  color: #1f2330;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid #d1d5e0;
+  border-right: 1px solid #e2e4eb;
+  z-index: 1;
+}
+
+.preview-table tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #eef0f5;
+  border-right: 1px solid #eef0f5;
+}
+
+.preview-table tbody tr.row-ouro td {
+  background: #fffbea;
+}
+.preview-table tbody tr.row-prata td {
+  background: #f4f4f7;
+}
+.preview-table tbody tr.row-aco td {
+  background: #cfd2d8;
+  color: #1f2330;
+}
+
+.cell-empty {
+  color: #b5b9c5;
+  font-style: italic;
+}
+
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #e2e4eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #fafbff;
+}
+
 .settings {
   background: #fff;
   border: 1px solid #e2e4eb;
@@ -222,6 +429,31 @@ h1 {
 }
 .banho-block.prata .field input:read-only {
   background: rgba(255, 255, 255, 0.5);
+}
+
+.banho-block.aco {
+  background: linear-gradient(180deg, #8a8d96 0%, #6b6e78 100%);
+  border-color: #4f525c;
+  color: #fff;
+}
+.banho-block.aco h4 {
+  color: #ffffff;
+}
+.banho-block.aco .field label {
+  color: #e2e4eb;
+}
+.banho-block.aco .field input {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: #4f525c;
+  color: #1f2330;
+}
+.banho-block.aco .field input:read-only {
+  background: rgba(255, 255, 255, 0.7);
+  color: #2a2d36;
+}
+
+.banhos-aco {
+  grid-template-columns: 1fr;
 }
 
 .banho-block h4 {

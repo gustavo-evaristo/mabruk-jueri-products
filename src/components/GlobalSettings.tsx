@@ -79,6 +79,13 @@ export function GlobalSettings() {
               onChange={(e) => update({ subcategoriaDefaultPrata: e.target.value })}
             />
           </label>
+          <label>
+            Subcategoria default AÇO
+            <input
+              value={settings.subcategoriaDefaultAco}
+              onChange={(e) => update({ subcategoriaDefaultAco: e.target.value })}
+            />
+          </label>
         </div>
       </div>
 

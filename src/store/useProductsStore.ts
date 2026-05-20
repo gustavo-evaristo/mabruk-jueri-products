@@ -1,16 +1,7 @@
 import { create } from 'zustand';
 import type { GlobalSettings, Product } from '../types';
-import produtosData from '../data/produtos.json';
-
-interface RawProduct {
-  codigo: string;
-  codigoFornecedor: string;
-  descricao: string;
-  qtde: number;
-  peso: number;
-  vUnit: number;
-  imageIndex: number;
-}
+import type { ParsedProduct } from '../lib/xlsxParser';
+import { isAco } from '../lib/calc';
 
 const initialSettings: GlobalSettings = {
   fornecedor: 'GF Brutos',
@@ -19,40 +10,53 @@ const initialSettings: GlobalSettings = {
   custoOuro2: 3.19,
   custoPrata30: 1.37,
   custoPrata50: 1.61,
-  subcategoriaDefaultOuro: 'LISOS OURO',
-  subcategoriaDefaultPrata: 'LISOS PRATA',
+  subcategoriaDefaultOuro: 'OURO',
+  subcategoriaDefaultPrata: 'PRATA',
+  subcategoriaDefaultAco: 'AÇO',
   markupPct: 1000,
 };
-
-const initialProducts: Product[] = (produtosData as RawProduct[]).map((p, idx) => ({
-  id: `brinco-${idx}`,
-  codigo: p.codigo,
-  codigoFornecedor: p.codigoFornecedor,
-  descricao: p.descricao,
-  qtde: p.qtde,
-  peso: p.peso,
-  vUnit: p.vUnit,
-  imageIndex: p.imageIndex,
-  categoria: 'BRINCO',
-  descontoPct: null,
-  qtdOuro: p.qtde,
-  qtdPrata: 0,
-  subcategoriaOuro: initialSettings.subcategoriaDefaultOuro,
-  subcategoriaPrata: initialSettings.subcategoriaDefaultPrata,
-  precoVarejoOuro: null,
-  precoVarejoPrata: null,
-}));
 
 interface StoreState {
   products: Product[];
   settings: GlobalSettings;
+  loadProducts: (parsed: ParsedProduct[]) => void;
+  reset: () => void;
   updateSettings: (patch: Partial<GlobalSettings>) => void;
   updateProduct: (id: string, patch: Partial<Product>) => void;
 }
 
+function buildProduct(p: ParsedProduct, idx: number, s: GlobalSettings): Product {
+  const aco = isAco(p.descricao);
+  return {
+    id: `prod-${idx}`,
+    codigo: p.codigo,
+    codigoFornecedor: p.codigoFornecedor,
+    descricao: p.descricao,
+    qtde: p.qtde,
+    peso: p.peso,
+    vUnit: p.vUnit,
+    categoria: p.categoria,
+    descontoPct: null,
+    qtdOuro: aco ? 0 : Math.floor(p.qtde / 2),
+    qtdPrata: aco ? 0 : Math.ceil(p.qtde / 2),
+    qtdAco: aco ? p.qtde : 0,
+    subcategoriaOuro: s.subcategoriaDefaultOuro,
+    subcategoriaPrata: s.subcategoriaDefaultPrata,
+    subcategoriaAco: s.subcategoriaDefaultAco,
+    precoVarejoOuro: null,
+    precoVarejoPrata: null,
+    precoVarejoAco: null,
+  };
+}
+
 export const useProductsStore = create<StoreState>((set) => ({
-  products: initialProducts,
+  products: [],
   settings: initialSettings,
+  loadProducts: (parsed) =>
+    set((state) => ({
+      products: parsed.map((p, i) => buildProduct(p, i, state.settings)),
+    })),
+  reset: () => set({ products: [] }),
   updateSettings: (patch) =>
     set((state) => {
       const next = { ...state.settings, ...patch };
@@ -66,6 +70,10 @@ export const useProductsStore = create<StoreState>((set) => ({
           p.subcategoriaPrata === state.settings.subcategoriaDefaultPrata
             ? next.subcategoriaDefaultPrata
             : p.subcategoriaPrata,
+        subcategoriaAco:
+          p.subcategoriaAco === state.settings.subcategoriaDefaultAco
+            ? next.subcategoriaDefaultAco
+            : p.subcategoriaAco,
       }));
       return { settings: next, products };
     }),

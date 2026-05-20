@@ -3,11 +3,14 @@ import {
   custoBanhoOuro,
   custoBanhoPrata,
   custoCompra,
+  custoTotalAco,
   custoTotalOuro,
   custoTotalPrata,
   descontoEfetivo,
+  isAco,
   milesimoOuro,
   milesimoPrata,
+  precoSugeridoAco,
   precoSugeridoOuro,
   precoSugeridoPrata,
 } from '../lib/calc';
@@ -88,20 +91,19 @@ function PrecoOverrideField({
   );
 }
 
-export function ProductCard({ p, imageUrl }: { p: Product; imageUrl?: string }) {
+export function ProductCard({ p }: { p: Product }) {
   const settings = useProductsStore((s) => s.settings);
   const update = useProductsStore((s) => s.updateProduct);
   const pct = descontoEfetivo(p, settings);
-  const sugOuro = precoSugeridoOuro(p, settings);
-  const sugPrata = precoSugeridoPrata(p, settings);
+  const aco = isAco(p.descricao);
 
   return (
     <div className="card">
       <div>
         <div className="photo">
-          {imageUrl ? <img src={imageUrl} alt={p.descricao} /> : <span className="code">sem foto</span>}
+          <span className="code">sem foto</span>
         </div>
-        <div className="ref">cód. PDF: {p.codigo}</div>
+        <div className="ref">cód: {p.codigo}</div>
       </div>
       <div className="body">
         <div className="row r1">
@@ -147,76 +149,110 @@ export function ProductCard({ p, imageUrl }: { p: Product; imageUrl?: string }) 
             readOnly
           />
         </div>
-        <div className="banhos">
-          <div className="banho-block ouro">
-            <h4>OURO · {milesimoOuro(p)} ms</h4>
-            <div className="row">
-              <NumberField
-                label="Qtd"
-                step="1"
-                value={p.qtdOuro}
-                onChange={(n) => update(p.id, { qtdOuro: Math.max(0, Math.round(n)) })}
-              />
-              <div className="field">
-                <label>Custo Banho (R$)</label>
-                <input readOnly value={fmt(custoBanhoOuro(p, settings))} />
+
+        {aco ? (
+          <div className="banhos banhos-aco">
+            <div className="banho-block aco">
+              <h4>AÇO · sem banho</h4>
+              <div className="row">
+                <NumberField
+                  label="Qtd"
+                  step="1"
+                  value={p.qtdAco}
+                  onChange={(n) => update(p.id, { qtdAco: Math.max(0, Math.round(n)) })}
+                />
+                <TextField
+                  label="Subcategoria"
+                  value={p.subcategoriaAco}
+                  onChange={(v) => update(p.id, { subcategoriaAco: v })}
+                />
               </div>
-            </div>
-            <div className="row sub">
-              <TextField
-                label="Subcategoria"
-                value={p.subcategoriaOuro}
-                onChange={(v) => update(p.id, { subcategoriaOuro: v })}
-              />
-            </div>
-            <div className="row">
-              <div className="field">
-                <label>Custo Total (R$)</label>
-                <input readOnly value={fmt(custoTotalOuro(p, settings))} />
+              <div className="row">
+                <div className="field">
+                  <label>Custo Total (R$)</label>
+                  <input readOnly value={fmt(custoTotalAco(p, settings))} />
+                </div>
+                <PrecoOverrideField
+                  label="Preço Varejo"
+                  sugerido={precoSugeridoAco(p, settings)}
+                  override={p.precoVarejoAco}
+                  onChange={(v) => update(p.id, { precoVarejoAco: v })}
+                />
               </div>
-              <PrecoOverrideField
-                label="Preço Varejo"
-                sugerido={sugOuro}
-                override={p.precoVarejoOuro}
-                onChange={(v) => update(p.id, { precoVarejoOuro: v })}
-              />
             </div>
           </div>
-          <div className="banho-block prata">
-            <h4>PRATA · {milesimoPrata(p)} ms</h4>
-            <div className="row">
-              <NumberField
-                label="Qtd"
-                step="1"
-                value={p.qtdPrata}
-                onChange={(n) => update(p.id, { qtdPrata: Math.max(0, Math.round(n)) })}
-              />
-              <div className="field">
-                <label>Custo Banho (R$)</label>
-                <input readOnly value={fmt(custoBanhoPrata(p, settings))} />
+        ) : (
+          <div className="banhos">
+            <div className="banho-block ouro">
+              <h4>OURO · {milesimoOuro(p)} ms</h4>
+              <div className="row">
+                <NumberField
+                  label="Qtd"
+                  step="1"
+                  value={p.qtdOuro}
+                  onChange={(n) => update(p.id, { qtdOuro: Math.max(0, Math.round(n)) })}
+                />
+                <div className="field">
+                  <label>Custo Banho (R$)</label>
+                  <input readOnly value={fmt(custoBanhoOuro(p, settings))} />
+                </div>
+              </div>
+              <div className="row sub">
+                <TextField
+                  label="Subcategoria"
+                  value={p.subcategoriaOuro}
+                  onChange={(v) => update(p.id, { subcategoriaOuro: v })}
+                />
+              </div>
+              <div className="row">
+                <div className="field">
+                  <label>Custo Total (R$)</label>
+                  <input readOnly value={fmt(custoTotalOuro(p, settings))} />
+                </div>
+                <PrecoOverrideField
+                  label="Preço Varejo"
+                  sugerido={precoSugeridoOuro(p, settings)}
+                  override={p.precoVarejoOuro}
+                  onChange={(v) => update(p.id, { precoVarejoOuro: v })}
+                />
               </div>
             </div>
-            <div className="row sub">
-              <TextField
-                label="Subcategoria"
-                value={p.subcategoriaPrata}
-                onChange={(v) => update(p.id, { subcategoriaPrata: v })}
-              />
-            </div>
-            <div className="row">
-              <div className="field">
-                <label>Custo Total (R$)</label>
-                <input readOnly value={fmt(custoTotalPrata(p, settings))} />
+            <div className="banho-block prata">
+              <h4>PRATA · {milesimoPrata(p)} ms</h4>
+              <div className="row">
+                <NumberField
+                  label="Qtd"
+                  step="1"
+                  value={p.qtdPrata}
+                  onChange={(n) => update(p.id, { qtdPrata: Math.max(0, Math.round(n)) })}
+                />
+                <div className="field">
+                  <label>Custo Banho (R$)</label>
+                  <input readOnly value={fmt(custoBanhoPrata(p, settings))} />
+                </div>
               </div>
-              <PrecoOverrideField
-                label="Preço Varejo"
-                sugerido={sugPrata}
-                override={p.precoVarejoPrata}
-                onChange={(v) => update(p.id, { precoVarejoPrata: v })}
-              />
+              <div className="row sub">
+                <TextField
+                  label="Subcategoria"
+                  value={p.subcategoriaPrata}
+                  onChange={(v) => update(p.id, { subcategoriaPrata: v })}
+                />
+              </div>
+              <div className="row">
+                <div className="field">
+                  <label>Custo Total (R$)</label>
+                  <input readOnly value={fmt(custoTotalPrata(p, settings))} />
+                </div>
+                <PrecoOverrideField
+                  label="Preço Varejo"
+                  sugerido={precoSugeridoPrata(p, settings)}
+                  override={p.precoVarejoPrata}
+                  onChange={(v) => update(p.id, { precoVarejoPrata: v })}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

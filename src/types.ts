@@ -24,18 +24,20 @@ export interface Product {
   qtde: number;
   peso: number;
   vUnit: number;
-  imageIndex: number;
   categoria: Categoria;
 
   descontoPct: number | null;
 
   qtdOuro: number;
   qtdPrata: number;
+  qtdAco: number;
   subcategoriaOuro: string;
   subcategoriaPrata: string;
+  subcategoriaAco: string;
   // null = preço sugerido pelo markup; number = override manual
   precoVarejoOuro: number | null;
   precoVarejoPrata: number | null;
+  precoVarejoAco: number | null;
 }
 
 export interface GlobalSettings {
@@ -48,5 +50,6 @@ export interface GlobalSettings {
   custoPrata50: number;
   subcategoriaDefaultOuro: string;
   subcategoriaDefaultPrata: string;
+  subcategoriaDefaultAco: string;
   markupPct: number;
 }
