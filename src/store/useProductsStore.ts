@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import type { GlobalSettings, Product } from '../types';
 import type { ParsedProduct } from '../lib/xlsxParser';
 import { isAco } from '../lib/calc';
+import { loadSettings, saveSettings } from '../lib/persistSettings';
 
-const initialSettings: GlobalSettings = {
+const defaultSettings: GlobalSettings = {
   fornecedor: 'GF Brutos',
   descontoGlobalPct: 0,
   custoOuro1: 2.46,
@@ -15,6 +16,8 @@ const initialSettings: GlobalSettings = {
   subcategoriaDefaultAco: 'AÇO',
   markupPct: 1000,
 };
+
+const initialSettings = loadSettings(defaultSettings);
 
 interface StoreState {
   products: Product[];
@@ -47,6 +50,10 @@ function buildProduct(p: ParsedProduct, idx: number, s: GlobalSettings): Product
     precoVarejoOuro: null,
     precoVarejoPrata: null,
     precoVarejoAco: null,
+    sourceImage: null,
+    imageUrlOuro: null,
+    imageUrlPrata: null,
+    imageUrlAco: null,
   };
 }
 
@@ -76,6 +83,7 @@ export const useProductsStore = create<StoreState>((set) => ({
             ? next.subcategoriaDefaultAco
             : p.subcategoriaAco,
       }));
+      saveSettings(next);
       return { settings: next, products };
     }),
   updateProduct: (id, patch) =>

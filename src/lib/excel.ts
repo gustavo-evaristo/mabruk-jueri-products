@@ -46,7 +46,7 @@ export type ExcelRow = ExcelCell[];
 function buildRowOuro(p: Product, s: GlobalSettings): ExcelRow {
   return [
     null,
-    null,
+    p.imageUrlOuro,
     null,
     null,
     p.descricao,
@@ -76,7 +76,7 @@ function buildRowOuro(p: Product, s: GlobalSettings): ExcelRow {
 function buildRowPrata(p: Product, s: GlobalSettings): ExcelRow {
   return [
     null,
-    null,
+    p.imageUrlPrata,
     null,
     null,
     p.descricao,
@@ -106,7 +106,7 @@ function buildRowPrata(p: Product, s: GlobalSettings): ExcelRow {
 function buildRowAco(p: Product, s: GlobalSettings): ExcelRow {
   return [
     null,
-    null,
+    p.imageUrlAco,
     null,
     null,
     p.descricao,

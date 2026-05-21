@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { useProductsStore } from '../store/useProductsStore';
 import {
   custoBanhoOuro,
@@ -14,6 +15,8 @@ import {
   precoSugeridoOuro,
   precoSugeridoPrata,
 } from '../lib/calc';
+import { pickImageFromDataTransfer, readFileAsDataUrl } from '../lib/files';
+import { ProductAiPanel } from './ProductAiPanel';
 import type { Product } from '../types';
 
 function fmt(n: number): string {
@@ -97,11 +100,37 @@ export function ProductCard({ p }: { p: Product }) {
   const remove = useProductsStore((s) => s.removeProduct);
   const pct = descontoEfetivo(p, settings);
   const aco = isAco(p.descricao);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   function handleRemove() {
     if (window.confirm(`Remover "${p.descricao}" da lista?`)) {
       remove(p.id);
     }
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    if (!dragOver) setDragOver(true);
+  }
+  function handleDragLeave() {
+    setDragOver(false);
+  }
+  async function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = pickImageFromDataTransfer(e.dataTransfer);
+    if (!file) return;
+    const dataUrl = await readFileAsDataUrl(file);
+    update(p.id, { sourceImage: dataUrl });
+  }
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const dataUrl = await readFileAsDataUrl(file);
+    update(p.id, { sourceImage: dataUrl });
   }
 
   return (
@@ -121,10 +150,30 @@ export function ProductCard({ p }: { p: Product }) {
           <line x1="14" y1="11" x2="14" y2="17" />
         </svg>
       </button>
-      <div>
-        <div className="photo">
-          <span className="code">sem foto</span>
-        </div>
+      <div className="card-left">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileSelect}
+        />
+        <button
+          type="button"
+          className={`photo dropzone ${dragOver ? 'drag-over' : ''}`}
+          onClick={() => fileRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          title={p.sourceImage ? 'Clique ou arraste para trocar' : 'Clique ou arraste uma foto'}
+        >
+          {p.sourceImage ? (
+            <img src={p.sourceImage} alt={p.descricao} />
+          ) : (
+            <span className="code">clique ou arraste a foto</span>
+          )}
+          {dragOver && <div className="drop-overlay">solte a imagem</div>}
+        </button>
         <div className="ref">cód: {p.codigo}</div>
       </div>
       <div className="body">
@@ -275,6 +324,8 @@ export function ProductCard({ p }: { p: Product }) {
             </div>
           </div>
         )}
+
+        <ProductAiPanel p={p} />
       </div>
     </div>
   );

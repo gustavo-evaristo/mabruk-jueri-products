@@ -38,6 +38,12 @@ export interface Product {
   precoVarejoOuro: number | null;
   precoVarejoPrata: number | null;
   precoVarejoAco: number | null;
+
+  // Integração IA
+  sourceImage: string | null;     // dataURL do romaneio (não persistido em localStorage)
+  imageUrlOuro: string | null;    // URL pública (ImgBB) da imagem ouro gerada
+  imageUrlPrata: string | null;
+  imageUrlAco: string | null;
 }
 
 export interface GlobalSettings {
