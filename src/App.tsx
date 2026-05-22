@@ -4,10 +4,29 @@ import { CategoryTabs } from './components/CategoryTabs';
 import { ProductCard } from './components/ProductCard';
 import { ExportButton } from './components/ExportButton';
 import { SpreadsheetUploader } from './components/SpreadsheetUploader';
+import { GerarImagemPage } from './components/GerarImagemPage';
 import { useProductsStore } from './store/useProductsStore';
 import type { Categoria } from './types';
 
+function usePathname() {
+  const [pathname, setPathname] = useState(() => window.location.pathname);
+  useEffect(() => {
+    const handler = () => setPathname(window.location.pathname);
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, []);
+  return pathname;
+}
+
 export function App() {
+  const pathname = usePathname();
+  if (pathname === '/gerar-imagem' || pathname === '/gerar-imagem/') {
+    return <GerarImagemPage />;
+  }
+  return <HomePage />;
+}
+
+function HomePage() {
   const products = useProductsStore((s) => s.products);
   const reset = useProductsStore((s) => s.reset);
   const [tab, setTab] = useState<Categoria>('BRINCO');
